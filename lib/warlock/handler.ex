@@ -1,6 +1,5 @@
 defmodule Warlock.Handler do
-  alias Warlock.Handler
-  alias Warlock.ModuleUtils
+  alias Warlock.{Handler, ModuleUtils}
   alias Plug.Conn
 
   @callback get(conn :: Conn.t()) :: Conn.t() | no_return
