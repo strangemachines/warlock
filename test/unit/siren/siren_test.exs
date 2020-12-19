@@ -47,6 +47,19 @@ defmodule WarlockTest.Siren do
     assert result[:properties][:summary] == "This resource does not exist."
   end
 
+  test "error/2 (400)" do
+    summary = "The data that was sent is invalid"
+
+    dummy Errors, [{"parse", :parse}] do
+      result = Siren.error(400, :errors)
+      assert called(Errors.parse(:errors))
+      assert result[:class] == ["error", "input-error"]
+      assert result[:properties][:code] == 400
+      assert result[:properties][:summary] == summary
+      assert result[:properties][:errors] == :parse
+    end
+  end
+
   test "error/2" do
     summary =
       "The request could not be processed because of an unspecified error"

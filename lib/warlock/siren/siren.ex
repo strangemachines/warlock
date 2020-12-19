@@ -34,6 +34,17 @@ defmodule Warlock.Siren do
     }
   end
 
+  def error(400, errors) do
+    %{
+      class: ["error", "input-error"],
+      properties: %{
+        code: 400,
+        summary: "The data that was sent is invalid",
+        errors: Errors.parse(errors)
+      }
+    }
+  end
+
   def error(code, errors, opts \\ []) do
     class = Keyword.get(opts, :class, "error")
     summary = Keyword.get(opts, :summary, @summary)
