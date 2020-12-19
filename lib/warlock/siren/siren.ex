@@ -45,6 +45,17 @@ defmodule Warlock.Siren do
     }
   end
 
+  def error(500, errors) do
+    %{
+      class: ["error", "internal-error"],
+      properties: %{
+        code: 500,
+        summary: "An internal error occured",
+        errors: Errors.parse(errors)
+      }
+    }
+  end
+
   def error(code, errors, opts \\ []) do
     class = Keyword.get(opts, :class, "error")
     summary = Keyword.get(opts, :summary, @summary)

@@ -60,6 +60,17 @@ defmodule WarlockTest.Siren do
     end
   end
 
+  test "error/2 (500)" do
+    dummy Errors, [{"parse", :parse}] do
+      result = Siren.error(500, :errors)
+      assert called(Errors.parse(:errors))
+      assert result[:class] == ["error", "internal-error"]
+      assert result[:properties][:code] == 500
+      assert result[:properties][:summary] == "An internal error occured"
+      assert result[:properties][:errors] == :parse
+    end
+  end
+
   test "error/2" do
     summary =
       "The request could not be processed because of an unspecified error"
