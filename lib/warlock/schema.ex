@@ -9,6 +9,12 @@ defmodule Warlock.Schema do
     (String.to_integer(page) - 1) * String.to_integer(items_per_page)
   end
 
+  def repo_module(caller_module, nil) do
+    Utils.slice_replace(caller_module, "Repo")
+  end
+
+  def repo_module(_caller_module, repo_module), do: repo_module
+
   defmacro __using__([]) do
     quote do
       alias unquote(Utils.slice_replace(__CALLER__.module, "Repo"))
