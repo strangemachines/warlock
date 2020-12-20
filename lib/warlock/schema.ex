@@ -24,6 +24,9 @@ defmodule Warlock.Schema do
       @primary_key {:id, key_type, autogenerate: true}
       @foreign_key_type key_type
 
+      def validate_fields(item), do: item
+
+      defoverridable validate_fields: 1
     end
   end
 end
