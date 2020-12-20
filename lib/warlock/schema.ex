@@ -1,6 +1,6 @@
 defmodule Warlock.Schema do
-  alias Warlock.ModuleUtils
   alias Ecto.{Changeset, Query, Schema}
+  alias Warlock.ModuleUtils, as: Utils
 
   @doc """
   Calculates the pagination offset given the current page and items per page
@@ -11,7 +11,7 @@ defmodule Warlock.Schema do
 
   defmacro __using__([]) do
     quote do
-      alias unquote(ModuleUtils.slice_replace(__CALLER__.module, "Repo"))
+      alias unquote(Utils.slice_replace(__CALLER__.module, "Repo"))
 
       alias Ecto.Changeset
 
