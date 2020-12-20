@@ -26,7 +26,16 @@ defmodule Warlock.Schema do
 
       def validate_fields(item), do: item
 
-      defoverridable validate_fields: 1
+      def changeset(item, payload) do
+        schema = unquote(__CALLER__.module)
+
+        item
+        |> Changeset.cast(payload, @public_fields)
+        |> Changeset.validate_required(@required_fields)
+        |> schema.validate_fields()
+      end
+
+      defoverridable changeset: 2, validate_fields: 1
     end
   end
 end

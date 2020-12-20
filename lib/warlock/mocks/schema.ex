@@ -1,4 +1,6 @@
 defmodule Warlock.Mocks.Schema do
-  use Warlock.Schema
+  @public_fields :public_fields
+  @required_fields :required_fields
 
+  use Warlock.Schema
 end
