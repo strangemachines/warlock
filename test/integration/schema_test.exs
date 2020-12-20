@@ -20,4 +20,8 @@ defmodule WarlockTest.Integration.Schema do
       end
     end
   end
+
+  test "set_user/2" do
+    assert Schema.set_user(:changeset, nil) == :changeset
+  end
 end

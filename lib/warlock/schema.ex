@@ -35,7 +35,9 @@ defmodule Warlock.Schema do
         |> schema.validate_fields()
       end
 
-      defoverridable changeset: 2, validate_fields: 1
+      def set_user(changeset, nil), do: changeset
+
+      defoverridable changeset: 2, set_user: 2, validate_fields: 1
     end
   end
 end
