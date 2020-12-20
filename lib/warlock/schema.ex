@@ -23,6 +23,13 @@ defmodule Warlock.Schema do
 
   @optional_callbacks new: 2, get: 2, get_count: 2, by_id: 2, edit: 3, delete: 2
 
+  @doc """
+  Calculates the pagination offset given the current page and items per page
+  """
+  def pagination_offset(page, items_per_page) do
+    (String.to_integer(page) - 1) * String.to_integer(items_per_page)
+  end
+
   defmacro __using__([]) do
     quote do
       alias unquote(ModuleUtils.slice_replace(__CALLER__.module, "Repo"))
