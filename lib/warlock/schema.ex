@@ -15,7 +15,7 @@ defmodule Warlock.Schema do
 
   def repo_module(_caller_module, repo_module), do: repo_module
 
-  defmacro __using__([]) do
+  defmacro __using__(opts \\ []) do
     quote do
       alias unquote(Utils.slice_replace(__CALLER__.module, "Repo"))
 
@@ -23,6 +23,7 @@ defmodule Warlock.Schema do
 
       import Ecto.Changeset
       import Ecto.Query
+      import Warlock.Schema
 
       use Ecto.Schema
 
@@ -42,6 +43,20 @@ defmodule Warlock.Schema do
       end
 
       def set_user(changeset, nil), do: changeset
+
+      if !Enum.member?(excludes, :create) do
+        def create(user_id, payload) do
+          repo = unquote(repo_module(__CALLER__.module, opts[:repo]))
+          schema = unquote(__CALLER__.module)
+
+          struct(schema)
+          |> schema.set_user(user_id)
+          |> schema.changeset(payload)
+          |> repo.insert()
+        end
+
+        defoverridable create: 2
+      end
 
       defoverridable changeset: 2, set_user: 2, validate_fields: 1
     end

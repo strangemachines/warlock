@@ -3,7 +3,7 @@ defmodule WarlockTest.Integration.Schema do
   import Dummy
 
   alias Ecto.Changeset
-  alias Warlock.Mocks.Schema
+  alias Warlock.Mocks.{Repo, Schema}
 
   test "validate_fields/1" do
     assert Schema.validate_fields(:item) == :item
@@ -23,5 +23,17 @@ defmodule WarlockTest.Integration.Schema do
 
   test "set_user/2" do
     assert Schema.set_user(:changeset, nil) == :changeset
+  end
+
+  test "create/2" do
+    dummy Repo, [{"insert", :insert}] do
+      dummy Schema, [{"set_user/2", :set_user}, {"changeset/2", :changeset}] do
+        result = Schema.create(:user_id, :payload)
+        assert called(Schema.set_user(%Schema{}, :user_id))
+        assert called(Schema.changeset(:set_user, :payload))
+        assert called(Repo.insert(:changeset))
+        assert result == :insert
+      end
+    end
   end
 end
