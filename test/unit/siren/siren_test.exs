@@ -40,6 +40,11 @@ defmodule WarlockTest.Siren do
     end
   end
 
+  test "message/2" do
+    expected = %{properties: %{code: :code, summary: :message}}
+    assert Siren.message(:code, :message) == expected
+  end
+
   test "error/1 (404)" do
     result = Siren.error(404)
     assert result[:class] == ["error", "not-found"]
