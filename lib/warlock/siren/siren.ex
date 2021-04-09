@@ -27,6 +27,13 @@ defmodule Warlock.Siren do
     %{properties: payload, links: Links.add_self([], conn)}
   end
 
+  @doc """
+  Produces an informational response.
+  """
+  def message(code, message) do
+    %{properties: %{code: code, summary: message}}
+  end
+
   def error(404) do
     %{
       class: ["error", "not-found"],
