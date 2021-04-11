@@ -60,6 +60,26 @@ defmodule Warlock.Handler do
     end
   end
 
+  defmacro payload(code, response_type) do
+    quote do
+      if unquote(response_type) == :siren do
+        siren_payload(unquote(code))
+      else
+        json_payload(unquote(code))
+      end
+    end
+  end
+
+  defmacro error(code, default_error, response_type) do
+    quote do
+      if unquote(response_type) == :siren do
+        siren_error(unquote(code))
+      else
+        json_error(unquote(code), unquote(default_error))
+      end
+    end
+  end
+
   def json(conn, status, payload) do
     conn
     |> Conn.put_resp_content_type("application/json")
@@ -112,20 +132,20 @@ defmodule Warlock.Handler do
                          "not implemented"
                        )
 
-      if @response_type == :siren do
-        siren_payload(200)
-        siren_payload(201)
-        siren_payload(202)
-        siren_error(400)
-        siren_error(403)
-        siren_error(404)
-        siren_error(405)
-        siren_error(409)
-        siren_error(415)
-        siren_error(422)
-        siren_error(500)
-        siren_error(501)
+      payload(200, @response_type)
+      payload(201, @response_type)
+      payload(202, @response_type)
+      error(400, @bad_request, @response_type)
+      error(403, @forbidden, @response_type)
+      error(404, @not_found, @response_type)
+      error(405, @not_allowed, @response_type)
+      error(409, @conflict, @response_type)
+      error(415, @unsupported, @response_type)
+      error(422, @unprocessable, @response_type)
+      error(500, @server_error, @response_type)
+      error(501, @not_implemented, @response_type)
 
+      if @response_type == :siren do
         def send_202(conn) do
           Handler.siren(conn, 202, Siren.message(202, @accepted))
         end
@@ -142,19 +162,6 @@ defmodule Warlock.Handler do
           |> Handler.siren(401, Siren.error(401, error))
         end
       else
-        json_payload(200)
-        json_payload(201)
-        json_payload(202)
-        json_error(400, @bad_request)
-        json_error(403, @forbidden)
-        json_error(404, @not_found)
-        json_error(405, @not_allowed)
-        json_error(409, @conflict)
-        json_error(415, @unsupported)
-        json_error(422, @unprocessable)
-        json_error(500, @server_error)
-        json_error(501, @not_implemented)
-
         def send_202(conn), do: Handler.message(conn, 202, @accepted)
 
         def send_401(conn) do
