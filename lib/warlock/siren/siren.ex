@@ -2,8 +2,6 @@ defmodule Warlock.Siren do
   alias Warlock.Siren
   alias Warlock.Siren.{Errors, Links}
 
-  @summary "The request could not be processed because of an unspecified error"
-
   def links(conn, count) do
     []
     |> Links.add_self(conn)
@@ -34,19 +32,12 @@ defmodule Warlock.Siren do
     %{properties: %{code: code, summary: message}}
   end
 
-  def error(404) do
-    %{
-      class: ["error", "not-found"],
-      properties: %{code: 404, summary: "This resource does not exist."}
-    }
-  end
-
   def error(code, errors, opts \\ []) do
-    class = Keyword.get(opts, :class, "error")
-    summary = Keyword.get(opts, :summary, @summary)
+    class = Keyword.get(opts, :class, ["error", "unknown"])
+    summary = Keyword.get(opts, :summary, "unknown error")
 
     %{
-      class: [class],
+      class: class,
       properties: %{code: code, summary: summary, errors: Errors.parse(errors)}
     }
   end

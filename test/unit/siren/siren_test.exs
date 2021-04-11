@@ -45,22 +45,12 @@ defmodule WarlockTest.Siren do
     assert Siren.message(:code, :message) == expected
   end
 
-  test "error/1 (404)" do
-    result = Siren.error(404)
-    assert result[:class] == ["error", "not-found"]
-    assert result[:properties][:code] == 404
-    assert result[:properties][:summary] == "This resource does not exist."
-  end
-
   test "error/2" do
-    summary =
-      "The request could not be processed because of an unspecified error"
-
     dummy Errors, [{"parse", :parse}] do
       result = Siren.error(:code, :errors)
-      assert result[:class] == ["error"]
+      assert result[:class] == ["error", "unknown"]
       assert result[:properties][:code] == :code
-      assert result[:properties][:summary] == summary
+      assert result[:properties][:summary] == "unknown error"
       assert result[:properties][:errors] == :parse
       assert called(Errors.parse(:errors))
     end
@@ -68,7 +58,7 @@ defmodule WarlockTest.Siren do
 
   test "error/3 with class option" do
     dummy Errors, [{"parse", :parse}] do
-      result = Siren.error(:code, :errors, class: "custom")
+      result = Siren.error(:code, :errors, class: ["custom"])
       assert result[:class] == ["custom"]
     end
   end
