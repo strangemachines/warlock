@@ -37,12 +37,10 @@ defmodule WarlockTest.Integration.Mocks.SirenHandler do
   end
 
   test "send_202/1" do
-    payload = "The request has been accepted"
-
     dummy Siren, [{"message/2", :message}] do
       dummy Handler, [{"siren/3", :siren}] do
         assert SirenHandler.send_202(:conn) == :siren
-        assert called(Siren.message(202, payload))
+        assert called(Siren.message(202, "accepted"))
         assert called(Handler.siren(:conn, 202, :message))
       end
     end
