@@ -48,14 +48,31 @@ defmodule Warlock.Handler do
     end
   end
 
-  defmacro siren_error(code) do
+  defmacro siren_error(code, default_error) do
     quote do
       def unquote(:"send_#{code}")(conn) do
-        Handler.siren(conn, unquote(code), Siren.error(unquote(code)))
+        error =
+          Siren.error(unquote(code), [],
+            class: ["error", unquote(default_error)],
+            summary: unquote(default_error)
+          )
+
+        Handler.siren(conn, unquote(code), error)
       end
 
       def unquote(:"send_#{code}")(conn, error) do
-        Handler.siren(conn, unquote(code), Siren.error(unquote(code), error))
+        siren_error =
+          Siren.error(unquote(code), error,
+            class: ["error", unquote(default_error)],
+            summary: unquote(default_error)
+          )
+
+        Handler.siren(conn, unquote(code), siren_error)
+      end
+
+      def unquote(:"send_#{code}")(conn, error, opts) do
+        siren_error = Siren.error(unquote(code), error, opts)
+        Handler.siren(conn, unquote(code), siren_error)
       end
     end
   end
@@ -73,7 +90,7 @@ defmodule Warlock.Handler do
   defmacro error(code, default_error, response_type) do
     quote do
       if unquote(response_type) == :siren do
-        siren_error(unquote(code))
+        siren_error(unquote(code), unquote(default_error))
       else
         json_error(unquote(code), unquote(default_error))
       end
@@ -151,15 +168,27 @@ defmodule Warlock.Handler do
         end
 
         def send_401(conn) do
+          error =
+            Siren.error(401, [],
+              class: ["error", @unauthorized],
+              summary: @unauthorized
+            )
+
           conn
           |> unquote(__CALLER__.module).authenticate()
-          |> Handler.siren(401, Siren.error(401))
+          |> Handler.siren(401, error)
         end
 
-        def send_401(conn, error) do
+        def send_401(conn, custom_error) do
+          error =
+            Siren.error(401, custom_error,
+              class: ["error", @unauthorized],
+              summary: @unauthorized
+            )
+
           conn
           |> unquote(__CALLER__.module).authenticate()
-          |> Handler.siren(401, Siren.error(401, error))
+          |> Handler.siren(401, error)
         end
       else
         def send_202(conn), do: Handler.message(conn, 202, @accepted)
