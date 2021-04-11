@@ -94,16 +94,23 @@ defmodule Warlock.Handler do
 
       @response_type unquote(opts[:response_type]) ||
                        Application.get_env(name, :response_type, :json)
+      @messages Application.get_env(name, :default_messages, [])
 
-      @request_accepted "The request has been accepted"
-      @request_forbidden "You're not allowed to perform this action"
-      @request_not_found "The requested resource does not exist"
-      @request_not_allowed "This method is not allowed here"
-      @request_conflict "This request would result in a conflict"
-      @request_unsupported_media "This media type is unsupported"
-      @request_unprocessable "Unable to process this request"
-      @server_error "An unknown internal error occured"
-      @server_not_implemented "This endpoint has not been implemented yet"
+      @accepted Keyword.get(@messages, :accepted, "accepted")
+      @bad_request Keyword.get(@messages, :bad_request, "bad request")
+      @unauthorized Keyword.get(@messages, :unauthorized, "unauthorized")
+      @forbidden Keyword.get(@messages, :forbidden, "forbidden")
+      @not_found Keyword.get(@messages, :not_found, "not found")
+      @not_allowed Keyword.get(@messages, :not_allowed, "not allowed")
+      @conflict Keyword.get(@messages, :conflict, "conflict")
+      @unsupported Keyword.get(@messages, :unsupported, "unsupported")
+      @unprocessable Keyword.get(@messages, :unprocessable, "unprocessable")
+      @server_error Keyword.get(@messages, :internal_error, "unknown")
+      @not_implemented Keyword.get(
+                         @messages,
+                         :not_implemented,
+                         "not implemented"
+                       )
 
       if @response_type == :siren do
         siren_payload(200)
@@ -120,7 +127,7 @@ defmodule Warlock.Handler do
         siren_error(501)
 
         def send_202(conn) do
-          Handler.siren(conn, 202, Siren.message(202, @request_accepted))
+          Handler.siren(conn, 202, Siren.message(202, @accepted))
         end
 
         def send_401(conn) do
@@ -138,22 +145,22 @@ defmodule Warlock.Handler do
         json_payload(200)
         json_payload(201)
         json_payload(202)
-        json_error(400, "Bad request")
-        json_error(403, @request_forbidden)
-        json_error(404, @request_not_found)
-        json_error(405, @request_not_allowed)
-        json_error(409, @request_conflict)
-        json_error(415, @request_unsupported_media)
-        json_error(422, @request_unprocessable)
+        json_error(400, @bad_request)
+        json_error(403, @forbidden)
+        json_error(404, @not_found)
+        json_error(405, @not_allowed)
+        json_error(409, @conflict)
+        json_error(415, @unsupported)
+        json_error(422, @unprocessable)
         json_error(500, @server_error)
-        json_error(501, @server_not_implemented)
+        json_error(501, @not_implemented)
 
-        def send_202(conn), do: Handler.message(conn, 202, @request_accepted)
+        def send_202(conn), do: Handler.message(conn, 202, @accepted)
 
         def send_401(conn) do
           conn
           |> unquote(__CALLER__.module).authenticate()
-          |> Handler.message(401, "Your credentials are invalid")
+          |> Handler.message(401, @unauthorized)
         end
 
         def send_401(conn, error) do
