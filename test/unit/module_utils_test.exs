@@ -18,6 +18,17 @@ defmodule WarlockTest.ModuleUtils do
     end
   end
 
+  test "name_or_option/2" do
+    assert ModuleUtils.name_or_option(:module, :option) == :option
+  end
+
+  test "name_or_option/2 when option is nil" do
+    dummy ModuleUtils, [{"atom_name", :atom_name}] do
+      assert ModuleUtils.name_or_option(:module, nil) == :atom_name
+      assert called(ModuleUtils.atom_name(:module))
+    end
+  end
+
   test "replace_at/2" do
     dummy Module, [{"concat", :concat}, {"split", ["App", "Module"]}] do
       assert ModuleUtils.replace_at("App.Module", "Another") == :concat

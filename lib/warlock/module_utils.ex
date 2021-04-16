@@ -1,4 +1,7 @@
 defmodule Warlock.ModuleUtils do
+  @doc """
+  Helpers for working with Module.
+  """
   alias Warlock.ModuleUtils
 
   def name(module), do: module |> Module.split() |> List.first()
@@ -6,6 +9,11 @@ defmodule Warlock.ModuleUtils do
   def atom_name(module) do
     module |> ModuleUtils.name() |> String.downcase() |> String.to_atom()
   end
+
+  @doc """
+  Gets a module name from an option or from the module when no option is given.
+  """
+  def name_or_option(module, opt), do: opt || ModuleUtils.atom_name(module)
 
   @doc """
   Replaces a fragment of a module name, e.g App.Controllers.My -> App.Schemas.My
