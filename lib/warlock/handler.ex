@@ -115,7 +115,7 @@ defmodule Warlock.Handler do
 
   defmacro __using__(opts \\ []) do
     quote do
-      name = unquote(opts[:name]) || unquote(Utils.atom_name(__CALLER__.module))
+      name = unquote(Utils.name_or_option(__CALLER__.module, opts[:name]))
 
       alias Plug.Conn
       alias Warlock.Siren
