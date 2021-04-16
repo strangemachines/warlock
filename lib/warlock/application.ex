@@ -11,17 +11,23 @@ defmodule Warlock.Application do
       @port Application.get_env(name, :port, 8000)
 
       def start(_type, _args) do
-        repo = unquote(Utils.slice_replace(__CALLER__.module, "Repo"))
+        repo =
+          unquote(
+            if(opts[:repo], do: Utils.slice_replace(__CALLER__.module, "Repo"))
+          )
+
         router = unquote(Utils.slice_replace(__CALLER__.module, "Router"))
 
         supervisor =
           unquote(Utils.slice_replace(__CALLER__.module, "Supervisor"))
 
-        children = [
-          repo,
-          {Plug.Cowboy,
-           scheme: :http, plug: router, options: [port: @port, compress: true]}
-        ]
+        children =
+          [
+            repo,
+            {Plug.Cowboy,
+             scheme: :http, plug: router, options: [port: @port, compress: true]}
+          ]
+          |> Enum.reject(fn x -> x == nil end)
 
         module = unquote(Utils.name(__CALLER__.module))
         Logger.info("#{module} started on port #{@port}")
