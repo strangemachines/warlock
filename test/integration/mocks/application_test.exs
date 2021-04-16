@@ -1,4 +1,4 @@
-defmodule WarlockTest.Mocks.Application do
+defmodule WarlockTest.Integration.Mocks.Application do
   use ExUnit.Case
   import Dummy
 
