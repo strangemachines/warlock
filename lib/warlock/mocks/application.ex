@@ -1,3 +1,3 @@
 defmodule Warlock.Mocks.Application do
-  use Warlock.Application
+  use Warlock.Application, repo: true
 end
