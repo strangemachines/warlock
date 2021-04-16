@@ -6,7 +6,7 @@ defmodule Warlock.Application do
       use Application
       require Logger
 
-      name = unquote(opts[:name]) || unquote(Utils.atom_name(__CALLER__.module))
+      name = unquote(Utils.name_or_option(__CALLER__.module, opts[:name]))
 
       @port Application.get_env(name, :port)
 
