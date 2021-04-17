@@ -41,8 +41,7 @@ defmodule Warlock.Handler do
         Handler.siren(conn, unquote(code), Siren.encode(conn, payload))
       end
 
-      def unquote(:"send_#{code}")(conn, payload, count)
-          when is_number(count) do
+      def unquote(:"send_#{code}")(conn, payload, count) do
         Handler.siren(conn, unquote(code), Siren.encode(conn, payload, count))
       end
     end
