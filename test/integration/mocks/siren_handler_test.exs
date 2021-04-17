@@ -7,6 +7,7 @@ defmodule WarlockTest.Integration.Mocks.SirenHandler do
   alias Warlock.Mocks.SirenHandler
 
   @payload_codes [200, 201, 202]
+  @error_codes [400, 403, 404, 405, 409, 415, 422, 500, 501]
 
   @messages_map %{
     400 => "bad request",
@@ -61,12 +62,16 @@ defmodule WarlockTest.Integration.Mocks.SirenHandler do
     end
   end
 
-  test "send_202/2" do
-    dummy Siren, [{"encode/2", :encoded}] do
-      dummy Handler, [{"siren/3", :siren}] do
-        assert SirenHandler.send_202(:conn, :payload) == :siren
-        assert called(Siren.encode(:conn, :payload))
-        assert called(Handler.siren(:conn, 202, :encoded))
+  for code <- @payload_codes do
+    test "send_#{code}/2" do
+      dummy Siren, [{"encode/2", :encoded}] do
+        dummy Handler, [{"siren/3", :siren}] do
+          assert SirenHandler.unquote(:"send_#{code}")(:conn, :payload) ==
+                   :siren
+
+          assert called(Siren.encode(:conn, :payload))
+          assert called(Handler.siren(:conn, unquote(code), :encoded))
+        end
       end
     end
   end
@@ -85,7 +90,7 @@ defmodule WarlockTest.Integration.Mocks.SirenHandler do
     end
   end
 
-  for code <- [400, 403, 404, 405, 409, 415, 422, 500, 501] do
+  for code <- @error_codes do
     test "send_#{code}/1" do
       text = @messages_map[unquote(code)]
       opts = [class: ["error", text], summary: text]
@@ -100,7 +105,7 @@ defmodule WarlockTest.Integration.Mocks.SirenHandler do
     end
   end
 
-  for code <- [400, 403, 404, 405, 409, 415, 422, 500, 501] do
+  for code <- @error_codes do
     test "send_#{code}/2" do
       text = @messages_map[unquote(code)]
       opts = [class: ["error", text], summary: text]
@@ -115,7 +120,7 @@ defmodule WarlockTest.Integration.Mocks.SirenHandler do
     end
   end
 
-  for code <- [400, 403, 404, 405, 409, 415, 422, 500, 501] do
+  for code <- @error_codes do
     test "send_#{code}/3" do
       dummy Siren, [{"error/3", :err}] do
         dummy Handler, [{"siren/3", :siren}] do
