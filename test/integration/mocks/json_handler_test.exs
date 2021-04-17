@@ -6,6 +6,22 @@ defmodule WarlockTest.Integration.Mocks.JsonHandler do
   alias Warlock.Handler
   alias Warlock.Mocks.JsonHandler
 
+  @payload_codes [200, 201, 202]
+  @error_codes [400, 403, 404, 405, 409, 415, 422, 500, 501]
+
+  @messages_map %{
+    400 => "bad request",
+    401 => "unauthorized",
+    403 => "forbidden",
+    404 => "not found",
+    405 => "not allowed",
+    409 => "conflict",
+    415 => "unsupported",
+    422 => "unprocessable",
+    500 => "unknown",
+    501 => "not implemented"
+  }
+
   test "get/1 with send_200/2" do
     dummy Handler, [{"json/3", :json}] do
       assert JsonHandler.get(:conn) == :json
@@ -34,21 +50,27 @@ defmodule WarlockTest.Integration.Mocks.JsonHandler do
     end
   end
 
-  test "send_202/2" do
-    dummy Handler, [{"json/3", :json}] do
-      assert JsonHandler.send_202(:conn, :payload) == :json
-      assert called(Handler.json(:conn, 202, :payload))
+  for code <- @payload_codes do
+    test "send_#{code}/2" do
+      dummy Handler, [{"json/3", :json}] do
+        assert JsonHandler.unquote(:"send_#{code}")(:conn, :payload) == :json
+        assert called(Handler.json(:conn, unquote(code), :payload))
+      end
     end
   end
 
-  test "send_400/1" do
-    dummy Handler, [{"message/3", :message}] do
-      assert JsonHandler.send_400(:conn) == :message
-      assert called(Handler.message(:conn, 400, "bad request"))
+  for code <- @error_codes do
+    test "send_#{code}/1" do
+      text = @messages_map[unquote(code)]
+
+      dummy Handler, [{"message/3", :message}] do
+        assert JsonHandler.unquote(:"send_#{code}")(:conn) == :message
+        assert called(Handler.message(:conn, unquote(code), text))
+      end
     end
   end
 
-  for code <- [400, 403, 404, 405, 409, 415, 422, 500, 501] do
+  for code <- @error_codes do
     test "send_#{code}/2" do
       dummy Handler, [{"json/3", :json}] do
         assert JsonHandler.unquote(:"send_#{code}")(:conn, :error) == :json
@@ -74,62 +96,6 @@ defmodule WarlockTest.Integration.Mocks.JsonHandler do
         assert called(JsonHandler.authenticate(:conn))
         assert called(Handler.json(:authenticate, 401, :error))
       end
-    end
-  end
-
-  test "send_403/1" do
-    dummy Handler, [{"message/3", :message}] do
-      assert JsonHandler.send_403(:conn) == :message
-      assert called(Handler.message(:conn, 403, "forbidden"))
-    end
-  end
-
-  test "send_404/1" do
-    dummy Handler, [{"message/3", :message}] do
-      assert JsonHandler.send_404(:conn) == :message
-      assert called(Handler.message(:conn, 404, "not found"))
-    end
-  end
-
-  test "send_405/1" do
-    dummy Handler, [{"message/3", :message}] do
-      assert JsonHandler.send_405(:conn) == :message
-      assert called(Handler.message(:conn, 405, "not allowed"))
-    end
-  end
-
-  test "send_409/1" do
-    dummy Handler, [{"message/3", :message}] do
-      assert JsonHandler.send_409(:conn) == :message
-      assert called(Handler.message(:conn, 409, "conflict"))
-    end
-  end
-
-  test "send_415/1" do
-    dummy Handler, [{"message/3", :message}] do
-      assert JsonHandler.send_415(:conn) == :message
-      assert called(Handler.message(:conn, 415, "unsupported"))
-    end
-  end
-
-  test "send_422/1" do
-    dummy Handler, [{"message/3", :message}] do
-      assert JsonHandler.send_422(:conn) == :message
-      assert called(Handler.message(:conn, 422, "unprocessable"))
-    end
-  end
-
-  test "send_500/1" do
-    dummy Handler, [{"message/3", :message}] do
-      assert JsonHandler.send_500(:conn) == :message
-      assert called(Handler.message(:conn, 500, "unknown"))
-    end
-  end
-
-  test "send_501/1" do
-    dummy Handler, [{"message/3", :message}] do
-      assert JsonHandler.send_501(:conn) == :message
-      assert called(Handler.message(:conn, 501, "not implemented"))
     end
   end
 end
