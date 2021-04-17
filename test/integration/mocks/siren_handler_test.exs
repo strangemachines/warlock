@@ -6,6 +6,8 @@ defmodule WarlockTest.Integration.Mocks.SirenHandler do
   alias Warlock.{Handler, Siren}
   alias Warlock.Mocks.SirenHandler
 
+  @payload_codes [200, 201, 202]
+
   @messages_map %{
     400 => "bad request",
     401 => "unauthorized",
@@ -59,12 +61,26 @@ defmodule WarlockTest.Integration.Mocks.SirenHandler do
     end
   end
 
-  test " send_202/2" do
+  test "send_202/2" do
     dummy Siren, [{"encode/2", :encoded}] do
       dummy Handler, [{"siren/3", :siren}] do
         assert SirenHandler.send_202(:conn, :payload) == :siren
         assert called(Siren.encode(:conn, :payload))
         assert called(Handler.siren(:conn, 202, :encoded))
+      end
+    end
+  end
+
+  for code <- @payload_codes do
+    test "send_#{code}/3" do
+      dummy Siren, [{"encode/3", :encoded}] do
+        dummy Handler, [{"siren/3", :siren}] do
+          assert SirenHandler.unquote(:"send_#{code}")(:conn, :payload, :count) ==
+                   :siren
+
+          assert called(Siren.encode(:conn, :payload, :count))
+          assert called(Handler.siren(:conn, unquote(code), :encoded))
+        end
       end
     end
   end
