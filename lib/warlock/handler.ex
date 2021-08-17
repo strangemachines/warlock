@@ -141,6 +141,7 @@ defmodule Warlock.Handler do
       @conflict Keyword.get(@messages, :conflict, "conflict")
       @unsupported Keyword.get(@messages, :unsupported, "unsupported")
       @unprocessable Keyword.get(@messages, :unprocessable, "unprocessable")
+      @too_many Keyword.get(@messages, :too_many, "too many requests")
       @server_error Keyword.get(@messages, :internal_error, "unknown")
       @not_implemented Keyword.get(
                          @messages,
@@ -158,6 +159,7 @@ defmodule Warlock.Handler do
       error(409, @conflict, @response_type)
       error(415, @unsupported, @response_type)
       error(422, @unprocessable, @response_type)
+      error(429, @too_many, @response_type)
       error(500, @server_error, @response_type)
       error(501, @not_implemented, @response_type)
 
