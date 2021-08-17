@@ -7,7 +7,7 @@ defmodule WarlockTest.Integration.Mocks.SirenHandler do
   alias Warlock.Mocks.SirenHandler
 
   @payload_codes [200, 201, 202]
-  @error_codes [400, 403, 404, 405, 409, 415, 422, 500, 501]
+  @error_codes [400, 403, 404, 405, 409, 415, 422, 429, 500, 501]
 
   @messages_map %{
     400 => "bad request",
@@ -18,6 +18,7 @@ defmodule WarlockTest.Integration.Mocks.SirenHandler do
     409 => "conflict",
     415 => "unsupported",
     422 => "unprocessable",
+    429 => "too many requests",
     500 => "unknown",
     501 => "not implemented"
   }
