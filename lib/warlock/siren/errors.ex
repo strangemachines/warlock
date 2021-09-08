@@ -4,7 +4,6 @@ defmodule Warlock.Siren.Errors do
   """
 
   alias Warlock.Siren.Errors
-  alias Ecto.Changeset
 
   def error_type({_, [validation: :required]}), do: "missing-value"
   def error_type({_, [validation: :cast]}), do: "invalid-value"
@@ -13,7 +12,7 @@ defmodule Warlock.Siren.Errors do
   @doc """
   Formats Ecto.Changeset errors into Siren errors.
   """
-  def parse(%Changeset{errors: errors}) do
+  def parse(%{errors: errors}) do
     Enum.reduce(errors, [], fn {key, value}, acc ->
       error = %{
         field: key,
