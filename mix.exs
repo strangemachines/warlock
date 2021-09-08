@@ -26,12 +26,12 @@ defmodule Warlock.MixProject do
   defp deps do
     [
       {:credo, "~> 0.9", only: :dev, runtime: false},
-      {:ecto_sql, "~> 3.0", optional: true},
+      {:ecto_sql, "~> 3.7", optional: true},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
-      {:dummy, "~> 1.3", only: :test},
-      {:jason, "~> 1.1"},
-      {:plug, "~> 1.8"},
-      {:plug_cowboy, "~> 2.1"}
+      {:dummy, "~> 1.4", only: :test},
+      {:jason, "~> 1.2"},
+      {:plug, "~> 1.12"},
+      {:plug_cowboy, "~> 2.5"}
     ]
   end
 
