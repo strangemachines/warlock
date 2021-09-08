@@ -21,8 +21,10 @@ defmodule Warlock.Controller do
 
   defmacro __using__([]) do
     quote do
-      alias unquote(ModuleUtils.slice_replace(__CALLER__.module, "Repo"))
-      alias unquote(ModuleUtils.replace_at(__CALLER__.module, "Schemas"))
+      if Code.ensure_loaded?(Ecto) do
+        alias unquote(ModuleUtils.slice_replace(__CALLER__.module, "Repo"))
+        alias unquote(ModuleUtils.replace_at(__CALLER__.module, "Schemas"))
+      end
 
       @behaviour Warlock.Controller
     end

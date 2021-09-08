@@ -1,5 +1,7 @@
 defmodule Warlock.Mocks.Schema do
-  use Warlock.Schema
+  if Code.ensure_loaded?(Ecto) do
+    use Warlock.Schema
+  end
 
   def new(_host, _params), do: {:ok, "new"}
 
