@@ -1,5 +1,5 @@
 defmodule Warlock.Mocks.Controller do
-  use Warlock.Controller
+  use Warlock.Controller, model: Warlock.Mocks.Model
 
   def new(_host, _params), do: {:ok, "new"}
 

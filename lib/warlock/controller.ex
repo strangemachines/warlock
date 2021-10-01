@@ -1,32 +1,64 @@
-defmodule Warlock.Controller do
-  alias Warlock.ModuleUtils
-  alias Ecto.{Changeset, Query, Schema}
+if Code.ensure_loaded?(Ecto) do
+  defmodule Warlock.Controller do
+    alias Warlock.{Controller, ModuleUtils, Schema}
 
-  @callback new(host :: String.t(), params :: %{}) ::
-              {:ok, Schema.t()} | {:error, Changeset.t()}
+    @callback new(params :: map(), user :: Schema.user()) ::
+                Schema.query_result()
+    @callback get(params :: map(), user :: Schema.user()) ::
+                Schema.query_result()
+    @callback get_count(params :: map(), user :: Schema.user()) ::
+                Schema.query_result()
+    @callback show(id :: any(), user :: Schema.user()) :: Schema.query_result()
+    @callback edit(params :: map(), id :: any(), user :: Schema.user()) ::
+                Schema.query_result()
+    @callback delete(id :: any(), user :: Schema.user()) ::
+                Schema.query_result()
 
-  @callback get(host :: String.t(), params :: %{}) ::
-              {:ok, Schema.t()} | {:error, Changeset.t()}
+    @optional_callbacks new: 2,
+                        get: 2,
+                        get_count: 2,
+                        show: 2,
+                        edit: 3,
+                        delete: 2
 
-  @callback by_id(host :: String.t(), id :: String.t()) ::
-              {:ok, Schema.t()} | {:error, Query.CastError.t()}
+    defmacro __using__(opts \\ []) do
+      quote do
+        model = unquote(ModuleUtils.replace_at(__CALLER__.module, "Models"))
 
-  @callback edit(String.t(), String.t(), params :: %{}) ::
-              {:ok, Schema.t()} | {:error, Changeset.t()}
+        alias unquote(ModuleUtils.replace_at(__CALLER__.module, "Models"))
 
-  @callback delete(host :: String.t(), id :: String.t()) ::
-              {integer(), nil | Query.CastError.t()}
+        @behaviour Controller
 
-  @optional_callbacks new: 2, get: 2, by_id: 2, edit: 3, delete: 2
+        @model Keyword.get(unquote(opts), :model, model)
 
-  defmacro __using__([]) do
-    quote do
-      if Code.ensure_loaded?(Ecto) do
-        alias unquote(ModuleUtils.slice_replace(__CALLER__.module, "Repo"))
-        alias unquote(ModuleUtils.replace_at(__CALLER__.module, "Schemas"))
+        @impl true
+        def new(params, user), do: @model.new(params, user)
+
+        @impl true
+        def get(params, user), do: @model.get(params, user)
+
+        @impl true
+        def get_count(params, user), do: @model.get_count(params, user)
+
+        @impl true
+        def show(id, user), do: @model.show(id, user)
+
+        @impl true
+        def edit(params, id, user), do: @model.edit(params, id, user)
+
+        @impl true
+        def delete(id, user), do: @model.delete(id, user)
+
+        defoverridable new: 2,
+                       get: 2,
+                       get_count: 2,
+                       show: 2,
+                       edit: 3,
+                       delete: 2
       end
-
-      @behaviour Warlock.Controller
     end
+  end
+else
+  defmodule Warlock.Controller do
   end
 end
