@@ -73,6 +73,9 @@ end
 
 Not much happens in controllers in Warlock...for now.
 
+### Models
+
+Models are the place for permissions and other shared behaviours.
 
 ### Schemas
 
