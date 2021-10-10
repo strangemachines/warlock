@@ -207,6 +207,7 @@ if Code.ensure_loaded?(Ecto) do
                        get: 2,
                        get_count: 2,
                        show: 2,
+                       update: 2,
                        edit: 3,
                        delete: 2
       end
