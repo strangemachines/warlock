@@ -210,27 +210,27 @@ if Code.ensure_loaded?(Ecto) do
           |> unquote(__CALLER__.module).handle_query()
         end
 
-        defoverridable apply_preloads: 2,
+        defoverridable apply_offset: 2,
+                       apply_preloads: 2,
                        changeset: 2,
+                       count_items: 1,
+                       delete: 2,
+                       edit: 3,
                        embeds: 1,
+                       fetch_items: 3,
                        filter_by_id: 2,
                        filter_by_params: 2,
                        filter_by_user: 2,
-                       order_items: 2,
-                       limit_items: 2,
-                       handle_query: 1,
-                       fetch_items: 3,
-                       count_items: 1,
-                       page: 2,
-                       apply_offset: 2,
-                       new: 2,
                        get: 2,
                        get_count: 2,
+                       handle_query: 1,
+                       limit_items: 2,
+                       new: 2,
+                       order_items: 2,
+                       page: 2,
                        prepare_query: 2,
                        show: 2,
-                       update: 2,
-                       edit: 3,
-                       delete: 2
+                       update: 2
       end
     end
   end
