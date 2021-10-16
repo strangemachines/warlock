@@ -118,6 +118,9 @@ if Code.ensure_loaded?(Ecto) do
           end
         end
 
+        def embeds(%{"embeds" => embeds}), do: embeds
+        def embeds(_params), do: []
+
         def prepare_query(_params), do: unquote(__CALLER__.module)
 
         def fetch_items(query, params) do
@@ -200,6 +203,7 @@ if Code.ensure_loaded?(Ecto) do
         end
 
         defoverridable changeset: 2,
+                       embeds: 1,
                        filter_by_id: 2,
                        filter_by_params: 2,
                        filter_by_user: 2,
