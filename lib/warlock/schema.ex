@@ -43,6 +43,7 @@ if Code.ensure_loaded?(Ecto) do
         @required_fields Keyword.get(unquote(opts), :required_fields, [])
         @writable_fields Keyword.get(unquote(opts), :writable_fields, [])
         @user_field Keyword.get(unquote(opts), :user_field, "user")
+        @preloads Keyword.get(unquote(opts), :preloads, [])
 
         key_type = Application.get_env(name, :primary_key_type, :binary_id)
         @foreign_key_type key_type
@@ -121,14 +122,19 @@ if Code.ensure_loaded?(Ecto) do
         def embeds(%{"embeds" => embeds}), do: embeds
         def embeds(_params), do: []
 
-        def prepare_query(_params), do: unquote(__CALLER__.module)
+        def prepare_query(_params, _embeds), do: unquote(__CALLER__.module)
 
-        def fetch_items(query, params) do
+        def apply_preloads(query, _embeds) do
+          Ecto.Query.preload(query, ^@preloads)
+        end
+
+        def fetch_items(query, params, embeds) do
           query
           |> group_by(:id)
           |> order_items(params)
           |> limit_items(params)
           |> apply_offset(params)
+          |> apply_preloads(embeds)
           |> Repo.all()
         end
 
@@ -158,11 +164,13 @@ if Code.ensure_loaded?(Ecto) do
 
         @impl true
         def get(params, user) do
+          embeds = unquote(__CALLER__.module).embeds(params)
+
           params
           |> unquote(__CALLER__.module).prepare_query(embeds)
           |> unquote(__CALLER__.module).apply_user(user)
           |> unquote(__CALLER__.module).filter_by_params(params)
-          |> unquote(__CALLER__.module).fetch_items(params)
+          |> unquote(__CALLER__.module).fetch_items(params, embeds)
         end
 
         @impl true
@@ -202,7 +210,8 @@ if Code.ensure_loaded?(Ecto) do
           |> unquote(__CALLER__.module).handle_query()
         end
 
-        defoverridable changeset: 2,
+        defoverridable apply_preloads: 2,
+                       changeset: 2,
                        embeds: 1,
                        filter_by_id: 2,
                        filter_by_params: 2,
@@ -210,14 +219,14 @@ if Code.ensure_loaded?(Ecto) do
                        order_items: 2,
                        limit_items: 2,
                        handle_query: 1,
-                       fetch_items: 2,
+                       fetch_items: 3,
                        count_items: 1,
                        page: 2,
                        apply_offset: 2,
                        new: 2,
                        get: 2,
                        get_count: 2,
-                       prepare_query: 1,
+                       prepare_query: 2,
                        show: 2,
                        update: 2,
                        edit: 3,
