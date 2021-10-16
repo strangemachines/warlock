@@ -52,7 +52,7 @@ if Code.ensure_loaded?(Ecto) do
 
         def private_fields(), do: @private_fields
 
-        def filter_by_params(query, _params), do: query
+        def filter_by_params(query, params), do: filter_by_id(query, params)
 
         def filter_by_admin(query), do: query
         def filter_by_user(query, user), do: query
