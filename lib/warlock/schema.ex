@@ -163,10 +163,7 @@ if Code.ensure_loaded?(Ecto) do
 
         @impl true
         def show(id, user) do
-          unquote(__CALLER__.module)
-          |> where(id: ^id)
-          |> unquote(__CALLER__.module).apply_user(user)
-          |> unquote(__CALLER__.module).fetch_items(%{"items" => 1})
+          unquote(__CALLER__.module).get(%{"id" => id, "items" => 1}, user)
         end
 
         @impl true
