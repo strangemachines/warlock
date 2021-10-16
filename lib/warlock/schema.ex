@@ -179,7 +179,7 @@ if Code.ensure_loaded?(Ecto) do
         @impl true
         def edit(params, id, user) do
           case unquote(__CALLER__.module).show(id, user) do
-            [] -> :not_found
+            [] -> {:error, :not_found}
             [item] -> unquote(__CALLER__.module).update(item, params)
           end
         end
