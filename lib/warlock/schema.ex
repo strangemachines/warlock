@@ -58,6 +58,12 @@ if Code.ensure_loaded?(Ecto) do
         def filter_by_user(query, user), do: query
         def filter_by_anyone(query), do: query
 
+        def filter_by_id(query, %{"id" => id}) do
+          where(query, [q], q.id == ^id)
+        end
+
+        def filter_by_id(query, _params), do: query
+
         @doc """
         Applies filters for the given user. At this point the model has already
         checked permissions, so it's just about applying them in the query.
@@ -191,6 +197,7 @@ if Code.ensure_loaded?(Ecto) do
         end
 
         defoverridable changeset: 2,
+                       filter_by_id: 2,
                        filter_by_params: 2,
                        filter_by_user: 2,
                        order_items: 2,
