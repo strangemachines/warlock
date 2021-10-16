@@ -125,7 +125,7 @@ if Code.ensure_loaded?(Ecto) do
           query
           |> group_by(:id)
           |> subquery([:q])
-          |> select([q], count(q.id))
+          |> select([q], count(q.id, :distinct))
           |> Repo.all()
           |> List.first()
         end
