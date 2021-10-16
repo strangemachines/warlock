@@ -118,6 +118,8 @@ if Code.ensure_loaded?(Ecto) do
           end
         end
 
+        def prepare_query(_params), do: unquote(__CALLER__.module)
+
         def fetch_items(query, params) do
           query
           |> group_by(:id)
@@ -153,7 +155,8 @@ if Code.ensure_loaded?(Ecto) do
 
         @impl true
         def get(params, user) do
-          unquote(__CALLER__.module)
+          params
+          |> unquote(__CALLER__.module).prepare_query(embeds)
           |> unquote(__CALLER__.module).apply_user(user)
           |> unquote(__CALLER__.module).filter_by_params(params)
           |> unquote(__CALLER__.module).fetch_items(params)
@@ -210,6 +213,7 @@ if Code.ensure_loaded?(Ecto) do
                        new: 2,
                        get: 2,
                        get_count: 2,
+                       prepare_query: 1,
                        show: 2,
                        update: 2,
                        edit: 3,
