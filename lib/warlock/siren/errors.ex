@@ -7,6 +7,12 @@ defmodule Warlock.Siren.Errors do
 
   def error_type({_, [validation: :required]}), do: "missing-value"
   def error_type({_, [validation: :cast]}), do: "invalid-value"
+  def error_type({_, [validation: :inclusion]}), do: "invalid-value"
+  def error_type({_, [validation: :subset]}), do: "invalid-value"
+  def error_type({_, [validation: :exclusion]}), do: "invalid-value"
+  def error_type({_, [validation: :unsafe_unique]}), do: "invalid-unique"
+  def error_type({_, [validation: :format]}), do: "invalid-format"
+  def error_type({_, [validation: :length]}), do: "invalid-length"
   def error_type({_, _}), do: "unknown"
 
   @doc """
