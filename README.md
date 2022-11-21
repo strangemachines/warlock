@@ -9,7 +9,7 @@ Warlock is an API building library that generates as much code as possible, with
 ## Installation
 
 ```elixir
-{:warlock, "~> 0.3"}
+{:warlock, "~> 1.0"}
 ```
 
 ## Usage
