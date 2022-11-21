@@ -45,11 +45,11 @@ if Code.ensure_loaded?(Ecto) do
         @user_field Keyword.get(unquote(opts), :user_field, "user")
         @preloads Keyword.get(unquote(opts), :preloads, [])
 
-        key_type = Application.get_env(name, :primary_key_type, :binary_id)
+        key_type = Application.compile_env(name, :primary_key_type, :binary_id)
         @foreign_key_type key_type
         @primary_key {:id, key_type, autogenerate: true}
 
-        @items_per_page Application.get_env(name, :items_per_page, 20)
+        @items_per_page Application.compile_env(name, :items_per_page, 20)
 
         def private_fields(), do: @private_fields
 

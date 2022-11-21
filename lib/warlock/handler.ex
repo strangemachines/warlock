@@ -124,13 +124,17 @@ defmodule Warlock.Handler do
 
       @behaviour Warlock.Handler
 
-      @auth_challenge Application.get_env(name, :auth_challenge, "bearer")
-      @auth_error Application.get_env(name, :auth_error, "invalid_credentials")
-      @auth_realm Application.get_env(name, :auth_realm, name)
+      @auth_challenge Application.compile_env(name, :auth_challenge, "bearer")
+      @auth_error Application.compile_env(
+                    name,
+                    :auth_error,
+                    "invalid_credentials"
+                  )
+      @auth_realm Application.compile_env(name, :auth_realm, name)
 
       @response_type unquote(opts[:response_type]) ||
-                       Application.get_env(name, :response_type, :json)
-      @messages Application.get_env(name, :default_messages, [])
+                       Application.compile_env(name, :response_type, :json)
+      @messages Application.compile_env(name, :default_messages, [])
 
       @accepted Keyword.get(@messages, :accepted, "accepted")
       @bad_request Keyword.get(@messages, :bad_request, "bad request")
