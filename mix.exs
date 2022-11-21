@@ -25,7 +25,7 @@ defmodule Warlock.MixProject do
 
   defp deps do
     [
-      {:credo, "~> 0.9", only: :dev, runtime: false},
+      {:credo, "~> 1.6", only: :dev, runtime: false},
       {:ecto_sql, "~> 3.7", optional: true},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
       {:dummy, "~> 1.4", only: :test},
