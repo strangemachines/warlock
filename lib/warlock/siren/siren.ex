@@ -16,6 +16,7 @@ defmodule Warlock.Siren do
   """
   def encode(conn, payload, count) do
     %{
+      properties: %{items: count},
       entities: payload,
       links: Siren.links(conn, count)
     }
