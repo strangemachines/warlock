@@ -23,7 +23,11 @@ defmodule WarlockTest.Siren do
   end
 
   test "encode/3" do
-    expected = %{entities: :payload, links: :links}
+    expected = %{
+      properties: %{items: :count},
+      entities: :payload,
+      links: :links
+    }
 
     dummy Siren, [{"links/2", :links}] do
       assert Siren.encode(:conn, :payload, :count) == expected
