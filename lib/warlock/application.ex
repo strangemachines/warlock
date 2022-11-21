@@ -8,7 +8,7 @@ defmodule Warlock.Application do
 
       name = unquote(Utils.name_or_option(__CALLER__.module, opts[:name]))
 
-      @port Application.get_env(name, :port, 8000)
+      @port Application.compile_env(name, :port, 8000)
 
       def start(_type, _args) do
         repo =

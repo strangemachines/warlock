@@ -1,5 +1,5 @@
 defmodule Warlock.Utils do
-  @items_per_page Application.get_env(:warlock, :items_per_page, "20")
+  @items_per_page Application.compile_env(:warlock, :items_per_page, "20")
 
   def get_items(conn) do
     conn.query_params
