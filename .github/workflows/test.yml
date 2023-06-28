@@ -8,6 +8,8 @@ jobs:
       matrix:
         otp: ['24.3.2']
         elixir: ['1.13.4', '1.14.2']
+    env:
+      MIX_ENV: test
     steps:
       - uses: actions/checkout@v2
       - uses: erlef/setup-elixir@v1
@@ -15,4 +17,5 @@ jobs:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
       - run: mix deps.get
-      - run: mix test
+      - run: mix compile
+      - run: mix coveralls --no-compile
