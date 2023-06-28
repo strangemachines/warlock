@@ -141,7 +141,7 @@ if Code.ensure_loaded?(Ecto) do
         def count_items(query) do
           query
           |> group_by(:id)
-          |> subquery([:q])
+          |> subquery()
           |> select([q], count(q.id, :distinct))
           |> Repo.all()
           |> List.first()
