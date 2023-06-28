@@ -21,11 +21,24 @@ if Code.ensure_loaded?(Ecto) do
                         edit: 3,
                         delete: 2
 
+    @doc """
+    Takes the result of query and normalizes it to a tuple.
+    """
+    def list_to_outcome(list) do
+      case list do
+        [] -> {:error, :not_found}
+        [item] -> {:ok, item}
+        _ -> {:error, :too_many_items}
+      end
+    end
+
     defmacro __using__(opts \\ []) do
       quote do
         model = unquote(ModuleUtils.replace_at(__CALLER__.module, "Models"))
 
         alias unquote(ModuleUtils.replace_at(__CALLER__.module, "Models"))
+
+        alias Warlock.Controller, as: WarlockController
 
         @behaviour Controller
 
