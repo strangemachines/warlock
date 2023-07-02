@@ -32,7 +32,10 @@ defmodule Warlock.Application do
         module = unquote(Utils.name(__CALLER__.module))
         Logger.info("#{module} started on port #{@port}")
 
-        Supervisor.start_link(children, strategy: :one_for_one, name: supervisor)
+        Supervisor.start_link(children,
+          strategy: :one_for_one,
+          name: supervisor
+        )
       end
     end
   end
