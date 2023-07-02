@@ -14,6 +14,9 @@ defmodule Warlock.Handler do
 
   @optional_callbacks get: 1, new: 1, show: 2, edit: 2, delete: 2
 
+  def get_user_kind(conn, auth_kind) do
+    if auth_kind == :anyone, do: :anyone, else: conn.private[auth_kind]
+  end
   defmacro __using__(opts \\ []) do
     quote do
       name = unquote(Utils.name_or_option(__CALLER__.module, opts[:name]))
