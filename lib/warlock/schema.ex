@@ -52,6 +52,8 @@ if Code.ensure_loaded?(Ecto) do
         @items_per_page Application.compile_env(name, :items_per_page, 20)
 
         def private_fields(), do: @private_fields
+        def required_fields(), do: @required_fields
+        def writable_fields(), do: @writable_fields
 
         def filter_by_params(query, params), do: filter_by_id(query, params)
 
