@@ -57,6 +57,22 @@ defmodule Warlock.Handler do
     end
   end
 
+  defmacro delete_item(controller, auth_kind) do
+    quote do
+      @impl true
+      def delete(conn, id) do
+        user = Handler.get_user_kind(conn, unquote(auth_kind))
+
+        case unquote(controller).delete(id, user) do
+          {0, nil} -> unquote(__CALLER__.module).send_404(conn)
+          {_, nil} -> unquote(__CALLER__.module).send_204(conn)
+          {:error, :not_found} -> unquote(__CALLER__.module).send_404(conn)
+          {:error, _} -> unquote(__CALLER__.module).send_500(conn)
+        end
+      end
+    end
+  end
+
   defmacro __using__(opts \\ []) do
     quote do
       name = unquote(Utils.name_or_option(__CALLER__.module, opts[:name]))
