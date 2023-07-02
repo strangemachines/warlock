@@ -24,6 +24,7 @@ defmodule Warlock.Handler do
       import Warlock.Handler.Builder
 
       @behaviour Warlock.Handler
+      @controller unquote(Utils.replace_at(__CALLER__.module, "Controllers"))
 
       @auth_challenge Application.compile_env(name, :auth_challenge, "bearer")
       @auth_error Application.compile_env(
