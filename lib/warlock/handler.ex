@@ -57,6 +57,20 @@ defmodule Warlock.Handler do
     end
   end
 
+  defmacro show_item(controller, auth_kind) do
+    quote do
+      @impl true
+      def show(conn, id) do
+        user = Handler.get_user_kind(conn, unquote(auth_kind))
+
+        case unquote(controller).show(id, user) do
+          [item] -> unquote(__CALLER__.module).send_200(conn, item)
+          [] -> unquote(__CALLER__.module).send_404(conn)
+        end
+      end
+    end
+  end
+
   defmacro edit_item(controller, auth_kind) do
     quote do
       @impl true
