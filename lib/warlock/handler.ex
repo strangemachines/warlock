@@ -1,4 +1,5 @@
 defmodule Warlock.Handler do
+  alias Warlock.Handler
   alias Warlock.ModuleUtils, as: Utils
   alias Plug.Conn
 
@@ -17,6 +18,31 @@ defmodule Warlock.Handler do
   def get_user_kind(conn, auth_kind) do
     if auth_kind == :anyone, do: :anyone, else: conn.private[auth_kind]
   end
+
+  defmacro new_item(controller, auth_kind) do
+    quote do
+      @impl true
+      def new(conn) do
+        user = Handler.get_user_kind(conn, unquote(auth_kind))
+
+        case unquote(controller).new(conn.body_params, user) do
+          {:ok, item} ->
+            unquote(__CALLER__.module).send_201(conn, item)
+
+          {:error, :forbidden} ->
+            unquote(__CALLER__.module).send_403(conn)
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            unquote(__CALLER__.module).send_422(conn, changeset,
+              class: "input-error"
+            )
+
+          {:error, _error} ->
+            unquote(__CALLER__.module).send_500(conn)
+        end
+      end
+    end
+  end
   defmacro __using__(opts \\ []) do
     quote do
       name = unquote(Utils.name_or_option(__CALLER__.module, opts[:name]))
@@ -24,6 +50,7 @@ defmodule Warlock.Handler do
       alias Plug.Conn
       alias unquote(Utils.replace_at(__CALLER__.module, "Controllers"))
 
+      import Warlock.Handler
       import Warlock.Handler.Builder
 
       @behaviour Warlock.Handler
