@@ -57,6 +57,34 @@ defmodule Warlock.Handler do
     end
   end
 
+  defmacro edit_item(controller, auth_kind) do
+    quote do
+      @impl true
+      def edit(conn, id) do
+        user = Handler.get_user_kind(conn, unquote(auth_kind))
+
+        case unquote(controller).edit(conn.body_params, id, user) do
+          {:ok, item} ->
+            unquote(__CALLER__.module).send_200(conn, item)
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            unquote(__CALLER__.module).send_422(conn, changeset,
+              class: "input-error"
+            )
+
+          {:error, :forbidden} ->
+            unquote(__CALLER__.module).send_403(conn)
+
+          {:error, :not_found} ->
+            unquote(__CALLER__.module).send_404(conn)
+
+          {:error, _} ->
+            unquote(__CALLER__.module).send_500(conn)
+        end
+      end
+    end
+  end
+
   defmacro delete_item(controller, auth_kind) do
     quote do
       @impl true
