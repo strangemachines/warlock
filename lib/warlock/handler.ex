@@ -43,6 +43,20 @@ defmodule Warlock.Handler do
       end
     end
   end
+
+  defmacro get_items(controller, auth_kind) do
+    quote do
+      @impl true
+      def get(conn) do
+        user = Handler.get_user_kind(conn, unquote(auth_kind))
+
+        count = unquote(controller).get_count(conn.query_params, user)
+        items = unquote(controller).get(conn.query_params, user)
+        send_200(conn, items, count)
+      end
+    end
+  end
+
   defmacro __using__(opts \\ []) do
     quote do
       name = unquote(Utils.name_or_option(__CALLER__.module, opts[:name]))
