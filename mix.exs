@@ -4,7 +4,7 @@ defmodule Warlock.MixProject do
   def project do
     [
       app: :warlock,
-      version: "1.0.1",
+      version: "2.0.0",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       description: description(),
