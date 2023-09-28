@@ -108,6 +108,7 @@ defmodule Warlock.Handler do
         case unquote(controller).delete(id, user) do
           {0, nil} -> unquote(__CALLER__.module).send_404(conn)
           {_, nil} -> unquote(__CALLER__.module).send_204(conn)
+          {:error, :forbidden} -> unquote(__CALLER__.module).send_403(conn)
           {:error, :not_found} -> unquote(__CALLER__.module).send_404(conn)
           {:error, _} -> unquote(__CALLER__.module).send_500(conn)
         end
