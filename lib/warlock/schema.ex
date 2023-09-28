@@ -177,7 +177,10 @@ if Code.ensure_loaded?(Ecto) do
 
         @impl true
         def get_count(params, user) do
-          unquote(__CALLER__.module)
+          embeds = unquote(__CALLER__.module).embeds(params)
+
+           params
+          |> unquote(__CALLER__.module).prepare_query(embeds)
           |> unquote(__CALLER__.module).apply_user(user)
           |> unquote(__CALLER__.module).filter_by_params(params)
           |> unquote(__CALLER__.module).count_items()
