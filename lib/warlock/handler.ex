@@ -32,6 +32,9 @@ defmodule Warlock.Handler do
           {:error, :forbidden} ->
             unquote(__CALLER__.module).send_403(conn)
 
+          {:error, :not_found} ->
+            unquote(__CALLER__.module).send_404(conn)
+
           {:error, %Ecto.Changeset{} = changeset} ->
             unquote(__CALLER__.module).send_422(conn, changeset,
               class: "input-error"
