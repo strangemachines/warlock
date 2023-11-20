@@ -92,6 +92,8 @@ if Code.ensure_loaded?(Ecto) do
           end
         end
 
+        def group_items(query, _params), do: group_by(query, :id)
+
         def order_items(query, _params), do: order_by(query, desc: :id)
 
         def limit_items(query, %{"items" => items}), do: limit(query, ^items)
@@ -132,7 +134,7 @@ if Code.ensure_loaded?(Ecto) do
 
         def fetch_items(query, params, embeds) do
           query
-          |> group_by(:id)
+          |> group_items(params)
           |> order_items(params)
           |> limit_items(params)
           |> apply_offset(params)
@@ -140,9 +142,9 @@ if Code.ensure_loaded?(Ecto) do
           |> Repo.all()
         end
 
-        def count_items(query) do
+        def count_items(query, params) do
           query
-          |> group_by(:id)
+          |> group_items(params)
           |> subquery()
           |> select([q], count(q.id, :distinct))
           |> Repo.all()
@@ -179,11 +181,11 @@ if Code.ensure_loaded?(Ecto) do
         def get_count(params, user) do
           embeds = unquote(__CALLER__.module).embeds(params)
 
-           params
+          params
           |> unquote(__CALLER__.module).prepare_query(embeds)
           |> unquote(__CALLER__.module).apply_user(user)
           |> unquote(__CALLER__.module).filter_by_params(params)
-          |> unquote(__CALLER__.module).count_items()
+          |> unquote(__CALLER__.module).count_items(params)
         end
 
         @impl true
@@ -218,7 +220,7 @@ if Code.ensure_loaded?(Ecto) do
         defoverridable apply_offset: 2,
                        apply_preloads: 2,
                        changeset: 2,
-                       count_items: 1,
+                       count_items: 2,
                        delete: 2,
                        edit: 3,
                        embeds: 1,
@@ -228,6 +230,7 @@ if Code.ensure_loaded?(Ecto) do
                        filter_by_user: 2,
                        get: 2,
                        get_count: 2,
+                       group_items: 2,
                        handle_query: 1,
                        limit_items: 2,
                        new: 2,
