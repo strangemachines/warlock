@@ -44,12 +44,15 @@ if Code.ensure_loaded?(Ecto) do
         @writable_fields Keyword.get(unquote(opts), :writable_fields, [])
         @user_field Keyword.get(unquote(opts), :user_field, "user")
         @preloads Keyword.get(unquote(opts), :preloads, [])
+        @validations Keyword.get(unquote(opts), :validations, [])
 
         key_type = Application.compile_env(name, :primary_key_type, :binary_id)
         @foreign_key_type key_type
         @primary_key {:id, key_type, autogenerate: true}
 
         @items_per_page Application.compile_env(name, :items_per_page, 20)
+
+        @uuid_regexp ~r/^[a-z0-9]{8}-[a-f0-9]{4}-[4][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i
 
         def private_fields(), do: @private_fields
         def required_fields(), do: @required_fields
@@ -164,10 +167,40 @@ if Code.ensure_loaded?(Ecto) do
           end)
         end
 
+        def validate_id(changeset) do
+          if elem(@primary_key, 0) == :id do
+            Changeset.validate_format(changeset, :id, @uuid_regexp)
+          else
+            changeset
+          end
+        end
+
+        def validate_foreign_keys(changeset) do
+          unquote(__CALLER__.module).get_foreign_keys()
+          |> Enum.reduce(changeset, fn field, acc ->
+            Changeset.validate_format(acc, field, @uuid_regexp)
+          end)
+        end
+
+        def apply_custom_validations(changeset) do
+          @validations
+          |> Enum.reduce(changeset, fn [field, validation, opts], acc ->
+            apply(Ecto.Changeset, validation, [acc, field, opts])
+          end)
+        end
+
+        def validate(changeset) do
+          changeset
+          |> Ecto.Changeset.validate_required(@required_fields)
+          |> unquote(__CALLER__.module).validate_id()
+          |> unquote(__CALLER__.module).validate_foreign_keys()
+          |> unquote(__CALLER__.module).apply_custom_validations()
+        end
+
         def changeset(struct, params) do
           struct
           |> Ecto.Changeset.cast(params, @writable_fields)
-          |> Ecto.Changeset.validate_required(@required_fields)
+          |> unquote(__CALLER__.module).validate()
         end
 
         @impl true
@@ -251,6 +284,7 @@ if Code.ensure_loaded?(Ecto) do
                        page: 2,
                        prepare_query: 2,
                        show: 2,
+                       validate: 1,
                        update: 2
       end
     end
