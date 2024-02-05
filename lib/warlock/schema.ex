@@ -151,6 +151,19 @@ if Code.ensure_loaded?(Ecto) do
           |> List.first()
         end
 
+        def get_foreign_keys() do
+          unquote(__CALLER__.module).__schema__(:associations)
+          |> Enum.reduce([], fn key, acc ->
+            case unquote(__CALLER__.module).__schema__(:association, key) do
+              %Ecto.Association.BelongsTo{} = association ->
+                [association.owner_key | acc]
+
+              _ ->
+                acc
+            end
+          end)
+        end
+
         def changeset(struct, params) do
           struct
           |> Ecto.Changeset.cast(params, @writable_fields)
