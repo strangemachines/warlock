@@ -197,10 +197,13 @@ if Code.ensure_loaded?(Ecto) do
           |> unquote(__CALLER__.module).apply_custom_validations()
         end
 
+        def check_constraints(changeset), do: changeset
+
         def changeset(struct, params) do
           struct
           |> Ecto.Changeset.cast(params, @writable_fields)
           |> unquote(__CALLER__.module).validate()
+          |> unquote(__CALLER__.module).check_constraints()
         end
 
         @impl true
@@ -266,6 +269,7 @@ if Code.ensure_loaded?(Ecto) do
         defoverridable apply_offset: 2,
                        apply_preloads: 2,
                        changeset: 2,
+                       check_constraints: 1,
                        count_items: 2,
                        delete: 2,
                        edit: 3,
