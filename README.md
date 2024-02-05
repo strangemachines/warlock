@@ -8,7 +8,7 @@ Warlock is an API building library that generates as much code as possible, with
 ## Installation
 
 ```elixir
-{:warlock, "~> 2.1"}
+{:warlock, "~> 2.2"}
 ```
 
 ## Usage
