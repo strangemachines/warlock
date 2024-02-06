@@ -57,6 +57,7 @@ if Code.ensure_loaded?(Ecto) do
         def private_fields(), do: @private_fields
         def required_fields(), do: @required_fields
         def writable_fields(), do: @writable_fields
+        def validations(), do: @validations
 
         def filter_by_params(query, params), do: filter_by_id(query, params)
 
